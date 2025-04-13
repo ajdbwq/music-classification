@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>音乐流派识别系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .upload-box {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .progress {
+            display: none;
+            width: 100%;
+            height: 20px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎵 音乐流派识别系统</h1>
+    <div class="upload-box">
+        <form id="uploadForm">
+            <input type="file" name="file" accept=".wav,.mp3,.ogg" id="fileInput" style="display: none;"
+                onchange="handleFileSelect()">
+            <label for="fileInput" style="cursor: pointer;">
+                <h3>点击选择音乐文件（支持 WAV/MP3）</h3>
+                <p>或拖放文件至此区域</p>
+            </label>
+            <div class="progress">
+                <div id="progressBar" style="width: 0%; height: 100%; background: #4CAF50;"></div>
+            </div>
+            <button type="submit" style="margin-top: 15px; padding: 10px 20px;">开始识别</button>
+        </form>
+    </div>
+    <div id="result"></div>
+
+    <script>
+        // 拖放文件支持
+        const dropZone = document.querySelector('.upload-box');
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.backgroundColor = '#f0f0f0';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.backgroundColor = 'transparent';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.backgroundColor = 'transparent';
+            const file = e.dataTransfer.files[0];
+            handleFileUpload(file);
+        });
+
+        // 文件选择处理
+        function handleFileSelect() {
+            const file = document.getElementById('fileInput').files[0];
+            handleFileUpload(file);
+        }
+
+        async function handleFileUpload(file) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div>正在处理中...</div>';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.innerHTML = `<div style="color: red;">错误：${data.error}</div>`;
+                } else {
+                    let probsHtml = '<div>概率分布：</div>';
+                    for (const [genre, prob] of Object.entries(data.probabilities)) {
+                        probsHtml += `<div>${genre}: ${prob}</div>`;
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div style="color: green; font-size: 1.2em;">
+                            预测结果：${data.genre}
+                        </div>
+                        ${probsHtml}
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: red;">请求失败：${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
