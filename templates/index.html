@@ -1,116 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音乐流派识别系统</title>
+    <!-- 引入 particles.js -->
+    <script src="static/javascript/particles.js"></script>
     <style>
         body {
+            background-color: #f0f0f0;
+            /* 整体浅灰色背景 */
+            margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
         }
 
+        /* 粒子效果容器 */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* 交互和结果显示窗 */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.5);
+            /* 半透明白色背景 */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            /* 使容器内文本居中 */
+        }
+
+        /* 上传框样式 */
         .upload-box {
             border: 2px dashed #ccc;
-            padding: 30px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        #result {
+            /* 添加灰色虚线框 */
+            padding: 20px;
             margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
         }
 
+        /* 按钮样式 */
+        .upload-box button {
+            margin-top: 15px;
+            padding: 10px 20px;
+        }
+
+        /* 进度条样式 */
         .progress {
-            display: none;
-            width: 100%;
             height: 20px;
-            margin: 10px 0;
+            background-color: #f3f3f3;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        #progressBar {
+            height: 100%;
+            background: #ababab;
+            width: 0%;
         }
     </style>
 </head>
 
 <body>
-    <h1>🎵 音乐流派识别系统</h1>
-    <div class="upload-box">
-        <form id="uploadForm">
-            <input type="file" name="file" accept=".wav,.mp3,.ogg" id="fileInput" style="display: none;"
-                onchange="handleFileSelect()">
-            <label for="fileInput" style="cursor: pointer;">
-                <h3>点击选择音乐文件（支持 WAV/MP3）</h3>
-                <p>或拖放文件至此区域</p>
-            </label>
-            <div class="progress">
-                <div id="progressBar" style="width: 0%; height: 100%; background: #4CAF50;"></div>
-            </div>
-            <button type="submit" style="margin-top: 15px; padding: 10px 20px;">开始识别</button>
-        </form>
-    </div>
-    <div id="result"></div>
+    <!-- 粒子效果容器 -->
+    <div id="particles-js"></div>
 
-    <script>
-        // 拖放文件支持
-        const dropZone = document.querySelector('.upload-box');
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.backgroundColor = '#f0f0f0';
-        });
+    <!-- 交互和结果显示窗 -->
+    <div class="container">
+        <h1>🎵 音乐流派识别系统</h1>
+        <div class="upload-box">
+            <form id="uploadForm">
+                <input type="file" name="file" accept=".wav,.mp3,.ogg" id="fileInput" style="display: none;"
+                    onchange="handleFileSelect()">
+                <label for="fileInput" style="cursor: pointer;">
+                    <h3>点击选择音乐文件（支持 WAV/MP3）</h3>
+                    <p>或拖放文件至此区域</p>
+                </label>
+                <div class="progress">
+                    <div id="progressBar" style="width: 0%; height: 100%; background: #ababab;"></div>
+                </div>
+                <button type="submit">开始识别</button>
+            </form>
+        </div>
+        <div id="result"></div>
 
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.backgroundColor = 'transparent';
-        });
+        <script>
+            // 拖放文件支持
+            const dropZone = document.querySelector('.upload-box');
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.backgroundColor = '#f0f0f0';
+            });
 
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.backgroundColor = 'transparent';
-            const file = e.dataTransfer.files[0];
-            handleFileUpload(file);
-        });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.backgroundColor = 'transparent';
+            });
 
-        // 文件选择处理
-        function handleFileSelect() {
-            const file = document.getElementById('fileInput').files[0];
-            handleFileUpload(file);
-        }
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.backgroundColor = 'transparent';
+                const file = e.dataTransfer.files[0];
+                handleFileUpload(file);
+            });
 
-        async function handleFileUpload(file) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<div>正在处理中...</div>';
+            // 文件选择处理
+            function handleFileSelect() {
+                const file = document.getElementById('fileInput').files[0];
+                handleFileUpload(file);
+            }
 
-            try {
-                const formData = new FormData();
-                formData.append('file', file);
+            function handleFileUpload(file) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '<div>正在处理中...</div>';
+                const progressBar = document.getElementById('progressBar');
 
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    body: formData
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/predict', true);
+
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBar.style.width = percentComplete + '%';
+                    }
                 });
 
-                const data = await response.json();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            const data = JSON.parse(xhr.responseText);
+                            if (data.error) {
+                                resultDiv.innerHTML = `<div style="color: red;">错误：${data.error}</div>`;
+                            } else {
+                                let probsHtml = '<div>概率分布：</div>';
+                                data.probabilities.forEach(item => {
+                                    probsHtml += `<div>${item.genre}: ${item.probability}</div>`;
+                                });
 
-                if (data.error) {
-                    resultDiv.innerHTML = `<div style="color: red;">错误：${data.error}</div>`;
-                } else {
-                    let probsHtml = '<div>概率分布：</div>';
-                    for (const [genre, prob] of Object.entries(data.probabilities)) {
-                        probsHtml += `<div>${genre}: ${prob}</div>`;
+                                resultDiv.innerHTML = `
+                                    <div style="color: green; font-size: 1.2em;">
+                                        预测结果：${data.genre}
+                                    </div>
+                                    ${probsHtml}
+                                `;
+                            }
+                        } else {
+                            resultDiv.innerHTML = `<div style="color: red;">请求失败：${xhr.statusText}</div>`;
+                        }
                     }
+                };
 
-                    resultDiv.innerHTML = `
-                        <div style="color: green; font-size: 1.2em;">
-                            预测结果：${data.genre}
-                        </div>
-                        ${probsHtml}
-                    `;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `<div style="color: red;">请求失败：${error.message}</div>`;
+                const formData = new FormData();
+                formData.append('file', file);
+                xhr.send(formData);
             }
-        }
+        </script>
+    </div>
+
+    <script>
+        // 初始化 particles.js
+        particlesJS.load('particles-js', 'particles.json', function () {
+            console.log('particles.js loaded - callback');
+        });
     </script>
 </body>
 
