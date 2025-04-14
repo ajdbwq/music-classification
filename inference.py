@@ -5,7 +5,6 @@ import json
 from torch import nn
 from joblib import load
 
-
 # 配置参数
 SAMPLE_RATE = 22050
 DURATION = 30
@@ -45,10 +44,11 @@ class CSVFeatureClassifier(nn.Module):
 
 class FeatureProcessor:
     """音频特征处理器（集成特征提取与标准化）"""
-    def __init__(self, scaler_path):
+    def __init__(self, scaler_path, feature_order):
         # 加载训练时的标准化参数
         self.expected_features = 58  # 根据实际CSV特征列数调整
         self.scaler = self._load_scaler(scaler_path)
+        self.feature_order = feature_order
 
     def _load_scaler(self, scaler_path):
         """加载训练时的标准化器"""
@@ -152,14 +152,18 @@ class FeatureProcessor:
 
     def _normalize_features(self, features):
         """特征标准化"""
-        # 按训练时的特征顺序构建数组
-        feature_array = np.array([features[k] for k in sorted(features.keys())])
+        # 按顺序构建数组
+        feature_array = np.array([features[key] for key in self.feature_order])
         return self.scaler.transform(feature_array.reshape(1, -1))
 
 class MusicGenreClassifier:
-    def __init__(self, model_path, class_map_path, scaler_path):
+    def __init__(self, model_path, class_map_path, scaler_path, feature_order_path):
+        # 加载训练时的特征顺序
+        with open(feature_order_path) as f:
+            feature_order = json.load(f)        
+
         # 初始化特征处理器
-        self.feature_processor = FeatureProcessor(scaler_path)
+        self.feature_processor = FeatureProcessor(scaler_path, feature_order)
         
         # 加载类别映射
         with open(class_map_path) as f:
@@ -184,20 +188,30 @@ class MusicGenreClassifier:
             outputs = self.model(input_tensor)
             probs = torch.softmax(outputs, dim=1).cpu().numpy()[0]
         
-        # 生成预测结果
+        # 生成排序后的概率列表
+        sorted_probs = sorted(
+            zip(self.classes, probs),
+            key=lambda x: x[1],
+            reverse=True
+        )
+        
         return {
-            "prediction": self.classes[np.argmax(probs)],
-            "probabilities": {cls: float(prob) for cls, prob in zip(self.classes, probs)}
+            "prediction": sorted_probs[0][0],
+            "probabilities": [
+                {"genre": cls, "probability": float(prob)} 
+                for cls, prob in sorted_probs
+            ]
         }
-
+    
 if __name__ == "__main__":
     classifier = MusicGenreClassifier(
-        model_path="model/best_model.pth",
-        class_map_path="model/class_map.json",
-        scaler_path="model/feature_scaler.joblib"
+        model_path="D:\\code\\music classification\\model\\best_model.pth",
+        class_map_path="D:\\code\\music classification\\model\\class_map.json",
+        scaler_path="D:\\code\\music classification\\model\\feature_scaler.joblib",
+        feature_order_path="D:\\code\\music classification\\model\\feature_order.json"
     )
     
-    result = classifier.predict("blues.00001.wav")
+    result = classifier.predict("country.00000.wav")
     print(f"预测结果: {result['prediction']}")
     print("概率分布:")
     for genre, prob in result['probabilities'].items():
