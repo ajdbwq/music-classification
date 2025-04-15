@@ -1,0 +1,8 @@
+# pip install -r requirements.txt
+
+Flask==3.0.3
+librosa==0.10.0
+numpy==1.26.4
+torch==2.6.0
+pandas==2.2.2
+joblib==1.4.2

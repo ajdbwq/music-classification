@@ -203,16 +203,3 @@ class MusicGenreClassifier:
             ]
         }
     
-if __name__ == "__main__":
-    classifier = MusicGenreClassifier(
-        model_path="D:\\code\\music classification\\model\\best_model.pth",
-        class_map_path="D:\\code\\music classification\\model\\class_map.json",
-        scaler_path="D:\\code\\music classification\\model\\feature_scaler.joblib",
-        feature_order_path="D:\\code\\music classification\\model\\feature_order.json"
-    )
-    
-    result = classifier.predict("country.00000.wav")
-    print(f"预测结果: {result['prediction']}")
-    print("概率分布:")
-    for genre, prob in result['probabilities'].items():
-        print(f"{genre}: {prob:.2%}")
