@@ -95,17 +95,17 @@ pip install -r requirements.txt
 
 
 ```
-Flask==2.2.3
+Flask==3.0.3
 
-librosa==0.10.0.post2
+librosa==0.10.0
 
-numpy==1.24.3
+numpy==1.26.4
 
-torch==2.0.1
+torch==2.6.0
 
-pandas==2.0.1
+pandas==2.2.2
 
-joblib==1.2.0
+joblib==1.4.2
 ```
 
 ## 四、运行项目
