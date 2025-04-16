@@ -1,7 +1,7 @@
 {
     "particles": {
         "number": {
-            "value": 180,
+            "value": 100,
             "density": {
                 "enable": true,
                 "value_area": 800
@@ -47,7 +47,7 @@
         },
         "line_linked": {
             "enable": true,
-            "distance": 150,
+            "distance": 200,
             "color": "#999999",
             "opacity": 0.4,
             "width": 1
@@ -67,7 +67,7 @@
             },
             "trail": {
                 "enable": true,
-                "length": 30,
+                "length": 10,
                 "fillColor": "#808080"
             }
         }
@@ -88,12 +88,12 @@
         "modes": {
             "attract": {
                 "distance": 400,
-                "duration": 30,
-                "easing": "ease-in-out",
-                "factor": 0.3
+                "duration": 1000,
+                "factor": 10,
+                "easing": "ease-in-out"
             },
             "grab": {
-                "distance": 300,
+                "distance": 200,
                 "line_linked": {
                     "opacity": 1
                 }
