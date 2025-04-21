@@ -27,6 +27,14 @@ function handleFileSelect() {
     const fileName = fileInput.files[0] ? fileInput.files[0].name : '';
     const label = document.querySelector('label[for="fileInput"]');
     label.innerHTML = `<h3>已选择文件：${fileName}</h3><p>点击开始识别</p>`;
+
+    const audioPlayer = document.getElementById('audioPlayer');
+    const file = fileInput.files[0];
+    if (file) {
+        const objectURL = URL.createObjectURL(file);
+        audioPlayer.src = objectURL;
+        audioPlayer.style.display = 'block';
+    }
 }
 
 document.getElementById('uploadForm').addEventListener('submit', function (e) {

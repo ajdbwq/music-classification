@@ -89,7 +89,7 @@
             "attract": {
                 "distance": 400,
                 "duration": 1000,
-                "factor": 10,
+                "factor": 2,
                 "easing": "ease-in-out"
             },
             "grab": {

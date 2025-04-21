@@ -43,7 +43,6 @@ def predict():
     
     try:
         result = classifier.predict(filepath)
-        os.remove(filepath)
 
         # 获取预测的流派
         predicted_genre = result['prediction']
@@ -60,7 +59,7 @@ def predict():
                 {"genre": item["genre"], "probability": f"{item['probability']*100:.1f}%"} 
                 for item in result['probabilities'][:3]  # 直接取前3项
             ],
-            'recommended_songs': recommended_songs
+            'recommended_songs': recommended_songs,
         })
     
     except Exception as e:
