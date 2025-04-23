@@ -49,7 +49,7 @@ body {
     height: 100%;
     background: rgba(201, 201, 201, 0.5);
     width: 0%;
-    transition: width 6s ease;
+    transition: width 5s ease;
 }
 
 /* 音频播放器容器 */
@@ -63,11 +63,11 @@ body {
 .custom-audio-player {
     width: 80%;
     max-width: 600px;
-    background-color: rgba(235, 235, 235, 0.5);
+    background-color: rgba(240, 240, 240, 0.6);
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
-    box-shadow: 0 0 10px rgba(186, 186, 186, 0.5);
+    box-shadow: 0 0 10px rgba(220, 220, 220, 0.6);
 }
 
 /* 隐藏默认的音频播放器控件 */
@@ -79,33 +79,33 @@ body {
 
 /* 自定义播放按钮样式 */
 .custom-audio-player::-webkit-media-controls-play-button {
-    background-color: rgba(177, 177, 177, 0.5);
-    color: rgb(133, 133, 133, 0.5);
+    background-color: rgba(180, 180, 180, 0.6);
+    color: rgb(135, 135, 135, 0.6);
     border-radius: 50%;
     padding: 5px;
 }
 
 .custom-audio-player::-webkit-media-controls-play-button:hover {
-    background-color: rgba(100, 100, 100, 0.5);
+    background-color: rgba(100, 100, 100, 0.6);
 }
 
 /* 自定义进度条样式 */
-.custom-audio-player::-webkit-media-controls-timeline {
-    background-color: rgba(235, 235, 235, 0.5);
+.custom-audio-player::-webkit-media-controls-timeline { 
+    background-color: rgba(235, 235, 235, 0.6);
     border-radius: 5px;
-    color: rgba(100, 100, 100, 0.5);
+    color: rgba(100, 100, 100, 0.6);
 }
 
 .custom-audio-player::-webkit-media-controls-current-time-display,
 .custom-audio-player::-webkit-media-controls-time-remaining-display {
-    color: rgba(50, 50, 50, 0.5);
+    color: rgba(50, 50, 50, 0.6);
 }
 
 /* 自定义音量控制样式 */
 .custom-audio-player::-webkit-media-controls-volume-slider {
-    background-color: rgba(235, 235, 235, 0.5);
+    background-color: rgba(235, 235, 235, 0.6);
     border-radius: 5px;
-    color: rgba(100, 100, 100, 0.5);
+    color: rgba(100, 100, 100, 0.6);
 }
 
 /* 结果展示 */

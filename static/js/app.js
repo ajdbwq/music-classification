@@ -61,9 +61,9 @@ document.getElementById('uploadForm').addEventListener('submit', function (e) {
                         probsHtml += `<div style="color: gray;">${item.genre}: ${item.probability}</div>`;
                     });
 
-                    let recommendedSongsHtml = '<table><tr><th>标题</th><th>时长</th><th>艺术家</th></tr>';
+                    let recommendedSongsHtml = '<table><tr><th>标题</th><th>时长</th><th>艺术家</th><th>播放</th></tr>';
                     data.recommended_songs.forEach(song => {
-                        recommendedSongsHtml += `<tr><td>${song.title}</td><td>${song.duration}</td><td>${song.artist}</td></tr>`;
+                        recommendedSongsHtml += `<tr><td>${song.title}</td><td>${song.duration}</td><td>${song.artist}</td><td><audio controls><source src="${song.audio_path}" type="audio/mpeg"></audio></td></tr>`;
                     });
                     recommendedSongsHtml += '</table>';
 

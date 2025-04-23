@@ -4,13 +4,14 @@ import logging
 import pandas as pd
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from inference import MusicGenreClassifier
+from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# 读取 metadata.csv 文件
-metadata = pd.read_csv('database/metadata.csv')
+# 读取 music_features.csv 文件
+music_features = pd.read_csv('database/music_features.csv')
 
 # 初始化分类器
 classifier = MusicGenreClassifier(
@@ -46,12 +47,27 @@ def predict():
 
         # 获取预测的流派
         predicted_genre = result['prediction']
+
+        # 提取用户上传音频的特征
+        user_features = result['features']
         
-        # 筛选出相同流派的歌曲
-        same_genre_songs = metadata[metadata['genre'] == predicted_genre]
+        # 筛选出所有音乐的特征
+        all_features = music_features[["length", "chroma_stft_mean", "chroma_stft_var", "rms_mean", "rms_var", "spectral_centroid_mean", "spectral_centroid_var", "spectral_bandwidth_mean", "spectral_bandwidth_var", "rolloff_mean", "rolloff_var", "zero_crossing_rate_mean", "zero_crossing_rate_var", "harmony_mean", "harmony_var", "perceptr_mean", "perceptr_var", "tempo", "mfcc1_mean", "mfcc1_var", "mfcc2_mean", "mfcc2_var", "mfcc3_mean", "mfcc3_var", "mfcc4_mean", "mfcc4_var", "mfcc5_mean", "mfcc5_var", "mfcc6_mean", "mfcc6_var", "mfcc7_mean", "mfcc7_var", "mfcc8_mean", "mfcc8_var", "mfcc9_mean", "mfcc9_var", "mfcc10_mean", "mfcc10_var", "mfcc11_mean", "mfcc11_var", "mfcc12_mean", "mfcc12_var", "mfcc13_mean", "mfcc13_var", "mfcc14_mean", "mfcc14_var", "mfcc15_mean", "mfcc15_var", "mfcc16_mean", "mfcc16_var", "mfcc17_mean", "mfcc17_var", "mfcc18_mean", "mfcc18_var", "mfcc19_mean", "mfcc19_var", "mfcc20_mean", "mfcc20_var"]].values
         
-        # 随机选择8首歌曲
-        recommended_songs = same_genre_songs.sample(min(8, len(same_genre_songs)))[['title', 'duration', 'artist']].to_dict(orient='records')
+        # 计算余弦相似度
+        similarities = cosine_similarity([user_features], all_features)[0]
+        
+        # 获取相似度最高的8首音乐的索引
+        top_indices = similarities.argsort()[-9:][::-1][1:]  # 排除自身
+        
+        # 获取推荐的歌曲信息
+        recommended_songs = music_features.iloc[top_indices][['title', 'duration', 'artist']].to_dict(orient='records')
+
+        # 为推荐的歌曲添加音频路径
+        for song in recommended_songs:
+            song_id = music_features[music_features['title'] == song['title']]['id'].values[0]
+            song_folder = str(song_id).zfill(6)[:3]
+            song['audio_path'] = f'database/fma_small/{song_folder}/{str(song_id).zfill(6)}.mp3'
 
         return jsonify({
             'genre': result['prediction'],

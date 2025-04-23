@@ -197,6 +197,7 @@ class MusicGenreClassifier:
         
         return {
             "prediction": sorted_probs[0][0],
+            "features": processed_features.flatten(),
             "probabilities": [
                 {"genre": cls, "probability": float(prob)} 
                 for cls, prob in sorted_probs

@@ -27,7 +27,9 @@ music-classification/
 
 ├── database/           # 音乐元数据文件
 
-│   └── metadata.csv    # 包含音乐的标题、时长、艺术家和流派等信息，用于相似歌曲推荐
+│   └── music_features.csv  # 包含音乐的标题、时长、艺术家、音乐特征等信息，用于相似歌曲推荐
+
+│   └── fma_small  # FMA数据集部分音频
 
 ├── uploads/            # 上传音频文件的临时存储目录
 
@@ -106,6 +108,8 @@ torch==2.6.0
 pandas==2.2.2
 
 joblib==1.4.2
+
+scikit-learn==1.5.1
 ```
 
 ## 四、运行项目
